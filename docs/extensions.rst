@@ -65,8 +65,8 @@ Keys:
 * ``path`` (*Unicode string*): HTTP path from URL, with percent-encoded
   sequences and UTF-8 byte sequences decoded into characters.
 
-* ``headers`` (*Iterable[[byte string, byte string]]*): An iterable of
-  ``[name, value]`` two-item iterables, where ``name`` is the header name, and
+* ``headers`` (*Iterable[(byte string, byte string)]*): An iterable of
+  ``(name, value)`` two-item tuples, where ``name`` is the header name, and
   ``value`` is the header value. Header names must be lowercased. Pseudo
   headers (present in HTTP/2 and HTTP/3) must not be present.
 
@@ -233,8 +233,8 @@ Keys:
 
 * ``type`` (*Unicode string*): ``"http.response.trailers"``
 
-* ``headers`` (*Iterable[[byte string, byte string]]*): An iterable of
-  ``[name, value]`` two-item iterables, where ``name`` is the header name, and
+* ``headers`` (*Iterable[(byte string, byte string)]*): An iterable of
+  ``(name, value)`` two-item tuples, where ``name`` is the header name, and
   ``value`` is the header value. Header names must be lowercased. Pseudo
   headers (present in HTTP/2 and HTTP/3) must not be present.
 

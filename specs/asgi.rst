@@ -144,7 +144,7 @@ serializable, and so they are only allowed to contain the following types:
 * Integers (within the signed 64-bit range)
 * Floating point numbers (within the IEEE 754 double precision range; no
   ``Nan`` or infinities)
-* Lists (tuples should be encoded as lists)
+* Lists (tuples should be encoded as lists when messages are serialized; header name/value pairs are tuples in process — see the HTTP spec)
 * Dicts (keys must be Unicode strings)
 * Booleans
 * ``None``

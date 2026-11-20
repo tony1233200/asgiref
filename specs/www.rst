@@ -63,7 +63,7 @@ protocol version:
   (the ASCII string "; ").
 
 The ASGI design decision is to transport both request and response headers as
-lists of 2-element ``[name, value]`` lists and preserve headers exactly as they
+lists of 2-element ``(name, value)`` tuples and preserve headers exactly as they
 were provided.
 
 For ASGI applications that support HTTP/2 or HTTP/3, care should be taken to
@@ -118,8 +118,8 @@ The *connection scope* information passed in ``scope`` contains:
   is mounted at; same as ``SCRIPT_NAME`` in WSGI. Optional; if missing
   defaults to ``""``.
 
-* ``headers`` (*Iterable[[byte string, byte string]]*) -- An iterable of
-  ``[name, value]`` two-item iterables, where ``name`` is the header name, and
+* ``headers`` (*Iterable[(byte string, byte string)]*) -- An iterable of
+  ``(name, value)`` two-item tuples, where ``name`` is the header name, and
   ``value`` is the header value. Order of header values must be preserved from
   the original HTTP request; order of header names is not important. Duplicates
   are possible and must be preserved in the message as received. Header names
@@ -204,8 +204,8 @@ Keys:
 
 * ``status`` (*int*) -- HTTP status code.
 
-* ``headers`` (*Iterable[[byte string, byte string]]*) -- An iterable
-  of ``[name, value]`` two-item iterables, where ``name`` is the
+* ``headers`` (*Iterable[(byte string, byte string)]*) -- An iterable
+  of ``(name, value)`` two-item tuples, where ``name`` is the
   header name, and ``value`` is the header value. Order must be
   preserved in the HTTP response.  Header names must be
   lowercased. Optional; if missing defaults to an empty list. Pseudo
@@ -329,8 +329,8 @@ metadata (mostly from the HTTP request line and headers):
   mounted at; same as ``SCRIPT_NAME`` in WSGI. Optional; if missing
   defaults to empty string.
 
-* ``headers`` (*Iterable[[byte string, byte string]]*) -- An iterable of
-  ``[name, value]`` two-item iterables, where ``name`` is the header name and
+* ``headers`` (*Iterable[(byte string, byte string)]*) -- An iterable of
+  ``(name, value)`` two-item tuples, where ``name`` is the header name and
   ``value`` is the header value. Order should be preserved from the original
   HTTP request; duplicates are possible and must be preserved in the message
   as received. Header names should be lowercased, but it is not required;
@@ -387,8 +387,8 @@ Sent by the application when it wishes to accept an incoming connection.
 * ``subprotocol`` (*Unicode string*) -- The subprotocol the server
   wishes to accept. Optional; if missing defaults to ``None``.
 
-* ``headers`` (*Iterable[[byte string, byte string]]*) -- An iterable
-  of ``[name, value]`` two-item iterables, where ``name`` is the
+* ``headers`` (*Iterable[(byte string, byte string)]*) -- An iterable
+  of ``(name, value)`` two-item tuples, where ``name`` is the
   header name, and ``value`` is the header value. Order must be
   preserved in the HTTP response.  Header names must be
   lowercased. Must not include a header named
