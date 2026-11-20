@@ -1,7 +1,9 @@
 import asyncio
+import concurrent.futures
 import contextvars
 import functools
 import multiprocessing
+import sys
 import threading
 import time
 import warnings
@@ -12,6 +14,7 @@ from unittest import TestCase
 
 import pytest
 
+from asgiref import sync
 from asgiref.sync import (
     AsyncSingleThreadContext,
     SyncToAsync,
@@ -599,6 +602,55 @@ def test_async_single_thread_context_matches():
     # They should not have run in the main thread, and on the same threads
     assert result_1["thread"] != threading.current_thread()
     assert result_1["thread"] == result_2["thread"]
+
+
+_context_var = contextvars.ContextVar("var")
+
+
+async def _set_context_var(value):
+    _context_var.set(value)
+
+
+def _sync_middle(value):
+    # Runs in a thread under sync_to_async, so async_to_sync schedules
+    # _set_context_var back onto the outer event loop.
+    async_to_sync(_set_context_var)(value)
+    return _context_var.get(None)
+
+
+def test_async_to_sync_context_propagation_stress():
+    """No patching: just make thread switches frequent and try many times."""
+    old = sys.getswitchinterval()
+    sys.setswitchinterval(1e-6)
+    try:
+
+        async def main():
+            lost = 0
+            for i in range(2000):
+                if await sync_to_async(_sync_middle)(i) != i:
+                    lost += 1
+            return lost
+
+        lost = asyncio.run(main())
+    finally:
+        sys.setswitchinterval(old)
+    assert lost == 0, f"contextvar lost in {lost}/2000 calls"
+
+
+def test_async_to_sync_context_propagation_deterministic(monkeypatch):
+    """Hold the loop thread right after it wakes the waiting sync thread."""
+
+    class SlowFuture(concurrent.futures.Future):
+        def set_result(self, result):
+            super().set_result(result)
+            time.sleep(0.05)
+
+    monkeypatch.setattr(sync, "Future", SlowFuture)
+
+    async def main():
+        return await sync_to_async(_sync_middle)(42)
+
+    assert asyncio.run(main()) == 42
 
 
 def test_async_single_thread_nested_context():
